@@ -848,7 +848,8 @@ class WorkflowBase(WorkflowBaseLoader):
         """
 
         Debug.vprint("Trimming expression matrix", level=1)
-        self.data.trim_genes(trim_gene_list=self.gene_names)
+        #self.data.trim_genes(trim_gene_list=self.gene_names) #CHANGED
+        self.data.trim_genes(trim_gene_list=self.gene_names,remove_constant_genes=False)
         self.priors_data = self.prior_manager.filter_priors_to_genes(self.priors_data, self.data.gene_names)
 
     def align_priors_and_expression(self):

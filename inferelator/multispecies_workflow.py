@@ -1,27 +1,18 @@
-"""
-Run Multitask Network Inference with TFA-AMuSR.
-"""
+# -*- coding: utf-8 -*-
+
 import copy
 import gc
 import warnings
 
 from inferelator.utils import Debug
 from inferelator import workflow
-from inferelator import single_cell_workflow
 from inferelator.regression import amusr_regression
 from inferelator.postprocessing.results_processor_mtl import ResultsProcessorMultiTask
-
-TRANSFER_ATTRIBUTES = ['count_minimum', 'preprocessing_workflow', 'input_dir']
-NON_TASK_ATTRIBUTES = ["gold_standard_file", "random_seed", "num_bootstraps"]
+from inferelator import amusr_workflow
 
 
-class MultitaskLearningWorkflow(single_cell_workflow.SingleCellWorkflow):
-    """
-    Class that implements multitask learning. Handles loading and validation of multiple data packages.
-    """
-
+class MultiSpeciesLearningWorklfow(amusr_workflow.MultitaskLearningWorkflow):
     _regulator_expression_filter = "intersection"
-    #_regulator_expression_filter = "union" #CHANGED
     _target_expression_filter = "union"
 
     # Task-specific data
@@ -513,3 +504,5 @@ def create_task_data_class(workflow_class="single-cell"):
             return new_task_objects
 
     return TaskData
+
+    

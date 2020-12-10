@@ -184,7 +184,8 @@ class RankSummingMetric(object):
         RankSummingMetric.transform_column(df, rank_col, FN, 'min')
 
         # Stick confusion results back onto the data and return it
-        data[[TP, FP, TN, FN]] = pd.NA
+        #data[[TP, FP, TN, FN]] = pd.NA Doesnt work
+        data = data.assign(TP = "NA",FP = "NA",TN = "NA",FN = "NA")
         data.loc[valid_gs_idx, [TP, FP, TN, FN]] = df[[TP, FP, TN, FN]]
 
         if _reindex is not None:

@@ -330,6 +330,8 @@ def ebic(X, Y, W, n_tasks, n_samples, n_preds, gamma=1):
         nonzero_pred = (W[:,k] != 0).sum()
 
         RSS = sum_squared_errors(X, Y, W, k)
+        if RSS == 0:  #Changed
+            RSS = 1
         BIC_penalty = nonzero_pred * np.log(n)
         BIC_extension = 2 * gamma * np.log(comb(n_preds, nonzero_pred))
         EBIC.append((n * np.log(RSS/n)) + BIC_penalty + BIC_extension)
