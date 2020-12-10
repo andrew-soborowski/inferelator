@@ -24,7 +24,7 @@ CV_SEEDS = list(range(42, 52))
 
 # Multiprocessing uses the pathos implementation of multiprocessing (with dill instead of cPickle)
 # This is suited for a single computer but will not work on a distributed cluster
-
+'''
 n_cores_local = 10
 local_engine = True
 
@@ -145,7 +145,7 @@ cv_wrap.workflow = worker
 
 # Run
 cv_wrap.run()
-
+'''
 # Inference on individual data sets with AMuSR
 # Using the crossvalidation wrapper
 # Run the regression 10 times and hold 20% of the gold standard out of the priors for testing each time
@@ -190,7 +190,7 @@ cv_wrap.workflow = worker
 
 # Run
 cv_wrap.run()
-
+'''
 # Final network
 # Create a worker
 worker = inferelator_workflow(regression="amusr", workflow="multitask")
@@ -219,3 +219,4 @@ worker.set_crossvalidation_parameters(split_gold_standard_for_crossvalidation=Fa
 worker.append_to_path("output_dir", "MTL_Final")
 worker.set_run_parameters(num_bootstraps=50, random_seed=100)
 final_network = worker.run()
+'''
