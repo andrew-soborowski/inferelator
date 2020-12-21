@@ -50,7 +50,18 @@ _KNOWN_CONFIG = {"prince": {"_job_n_workers": 20,
                                    "_queue": "preempt",
                                    "_job_extra_env_commands": copy.copy(_DEFAULT_ENV_EXTRA),
                                    "_job_slurm_commands": copy.copy(_DEFAULT_ENV_EXTRA) + ["--qos=preempt",
-                                                                                           "--constraint=info"]}
+                                                                                           "--constraint=info"]},
+                 "duke_dcc": {"_job_n_workers": 11,
+                              "_job_mem":  "32GB",
+                              "_job_time": "48:00:00",
+                              "_interface": "eth0",
+                              "job_extra_env_commands": copy.copy(_DEFAULT_ENV_EXTRA)},
+                 "duke_dcc_schmidlab":  {"_job_n_workers": 27,
+                                         "_job_mem":  "150GB",
+                                         "_job_time":  "48:00:00",
+                                         "_interface":  "eth0",
+                                         "_queue":  "schmidlab",
+                                         "job_extra_env_commands":  copy.copy(_DEFAULT_ENV_EXTRA)}
                  }
 
 _DEFAULT_LOCAL_WORKER_COMMAND = "dask-worker {a} --nprocs {p} --nthreads 1 --memory-limit 0 --local-directory {d}"
