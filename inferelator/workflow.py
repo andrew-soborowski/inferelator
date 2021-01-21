@@ -32,6 +32,9 @@ class WorkflowBaseLoader(object):
     """
     WorkflowBaseLoader is the class to load raw data. It does no processing; it only takes data from files.
     """
+    # Multispecies additions
+    homology_file = None
+    
     # Paths to the input and output locations
     input_dir = None
     output_dir = None
@@ -130,7 +133,7 @@ class WorkflowBaseLoader(object):
 
     def set_file_paths(self, input_dir=None, output_dir=None, expression_matrix_file=None, tf_names_file=None,
                        meta_data_file=None, priors_file=None, gold_standard_file=None, gene_metadata_file=None,
-                       gene_names_file=None):
+                       gene_names_file=None, homology_file=None):
         """
         Set the file paths necessary for the inferelator to run
 
@@ -165,6 +168,7 @@ class WorkflowBaseLoader(object):
         self._set_file_name("gold_standard_file", gold_standard_file)
         self._set_file_name("gene_metadata_file", gene_metadata_file)
         self._set_file_name("gene_names_file", gene_names_file)
+        self._set_file_name("homology_file", homology_file)
 
         if expression_matrix_file is not None:
             self._expression_loader = _TSV
@@ -395,7 +399,6 @@ class WorkflowBaseLoader(object):
         self.read_expression()
         self.read_tfs()
         self.read_priors()
-
         # Validate that necessary input settings exist
         self.validate_data()
 
@@ -486,6 +489,26 @@ class WorkflowBaseLoader(object):
             # Cast the dataframe into a list
             assert tfs.shape[1] == 1
             self.tf_names = tfs.values.flatten().tolist()
+            
+    def read_homology(self, file=None):
+            """
+            Read two-column homology list
+            """
+    
+            # Load the class variable if no file is passed
+            file = self.homology_file if file is None else file
+    
+            if file is not None:
+                Debug.vprint("Loading homolog names from file {file}".format(file=file), level=1)
+                # Read in a dataframe with no header or index
+                loader = InferelatorDataLoader(input_dir=self.input_dir, file_format_settings=self._file_format_settings)
+                homologs = loader.input_dataframe(file, header=None, index_col=None)
+    
+                # Cast the dataframe into a list
+                #assert tfs.shape[1] == 1
+                self.homologs = homologs
+
+
 
     def read_genes(self, file=None):
         """
@@ -926,6 +949,10 @@ def _factory_build_inferelator(regression=_RegressionWorkflowMixin, workflow=Wor
         elif workflow == "tfa":
             from inferelator.tfa_workflow import TFAWorkFlow
             workflow_class = TFAWorkFlow
+        elif workflow == "multispecies":
+            from inferelator.ms_workflow import MultispeciesLearningWorkflow
+            workflow_class = MultispeciesLearningWorkflow
+            use_mtl_regression = True
         elif workflow == "amusr" or workflow == "multitask":
             from inferelator.amusr_workflow import MultitaskLearningWorkflow
             workflow_class = MultitaskLearningWorkflow
@@ -959,6 +986,9 @@ def _factory_build_inferelator(regression=_RegressionWorkflowMixin, workflow=Wor
         elif regression == "elasticnet" and not use_mtl_regression:
             from inferelator.regression.elasticnet_python import ElasticNetWorkflowMixin
             regression_class = ElasticNetWorkflowMixin
+        elif regression == "multispecies":
+            from inferelator.regression.ms_amusr_regression import MS_AMUSRRegressionWorkflowMixin
+            regression_class = MS_AMUSRRegressionWorkflowMixin
         elif regression == "amusr":
             from inferelator.regression.amusr_regression import AMUSRRegressionWorkflowMixin
             regression_class = AMUSRRegressionWorkflowMixin

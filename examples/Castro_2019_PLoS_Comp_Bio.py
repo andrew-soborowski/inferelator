@@ -1,4 +1,4 @@
-# Load modules
+ # Load modules
 from inferelator import inferelator_workflow, inferelator_verbose_level, MPControl, CrossValidationManager
 
 # Set verbosity level to "Talky"
@@ -99,7 +99,7 @@ cv_wrap.workflow = worker
 
 # Run
 cv_wrap.run()
-
+'''
 # Inference on individual data sets with BBSR
 # A final network is generated from the two separate networks
 # Using the crossvalidation wrapper
@@ -190,6 +190,7 @@ cv_wrap.workflow = worker
 
 # Run
 cv_wrap.run()
+'''
 '''
 # Final network
 # Create a worker

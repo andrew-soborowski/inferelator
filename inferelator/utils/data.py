@@ -764,3 +764,94 @@ class InferelatorData(object):
     def _make_idx_str(df):
         df.index = df.index.astype(str) if not pat.is_string_dtype(df.index.dtype) else df.index
         df.columns = df.columns.astype(str) if not pat.is_string_dtype(df.columns.dtype) else df.columns
+
+    # New Multispecies
+    def separate_homolog_expression(self, homologs, convert_names=None, convert_names_to=None):
+        has_homolog = self._adata.var_names.isin(homologs)
+        names = self.gene_names[has_homolog]
+        if convert_names:
+            converter = dict(pd.concat([homologs, convert_names_to], axis=1).values.tolist())
+            names = [converter[x] for x in names]
+        return InferelatorData(expression_data=self._adata[:, has_homolog].X.copy(),
+                               gene_names=names),InferelatorData(expression_data=self._adata[:, ~has_homolog].X.copy(),
+                                gene_names=self.gene_names[~has_homolog])
+    
+    
+    def get_gene_data_ms(self, gene_list, copy=False, force_dense=False, to_df=False, zscore=False):
+        
+        df_tfs = set(self._adata.var.index)
+        missing_tfs = list(set(gene_list) - df_tfs)
+        x = self._adata.copy()
+        full_raw = np.concatenate((x.X, np.zeros((self.num_obs, len(missing_tfs)))),axis=1)
+        
+        combined_adata = AnnData(full_raw)
+        combined_adata.var = pd.DataFrame(index = self._adata.var.index.tolist()+missing_tfs)
+        x = combined_adata[:, gene_list]
+        #x = self._adata[:, gene_list]
+        labels = x.var_names
+
+        if (force_dense or to_df or zscore) and self.is_sparse:
+            x = x.X.A
+        else:
+            x = x.X
+
+        if zscore:
+            x = np.subtract(x, self.obs_means.reshape(-1, 1))
+            x = np.divide(x, self.obs_stdev.reshape(-1, 1))
+        elif copy:
+            x = x.copy()
+
+        return pd.DataFrame(x, columns=labels, index=self.sample_names) if to_df else x
+
+    # Returns a list of tfs that are present in this task and a list of tfs that are not (due to having no homolog)
+    def find_missing_genes(self, gene_list):
+        df_tfs = set(self._adata.var.index)
+        set_both = list(set(gene_list) & df_tfs)
+        set_gene_only = list(set(gene_list) - df_tfs)
+        
+        from string import ascii_lowercase
+        
+        letters = list(ascii_lowercase)
+        num_cols = 216
+        
+        excel_cols = []
+        for i in range(0, num_cols - 1):
+            n = i//26
+            m = n//26
+            i-=n*26
+            n-=m*26
+            col = letters[m-1]+letters[n-1]+letters[i] if m>0 else letters[n-1]+letters[i] if n>0 else letters[i]
+            excel_cols.append(col)
+
+        
+        
+        
+        
+        return set_both, set_gene_only
+    
+    # Returns a list of tfs that are present in this task and a list of tfs that are not (due to having no homolog)
+    def find_missing_genes_original(self, gene_list):
+        df_tfs = set(self._adata.var.index)
+        set_both = list(set(gene_list) & df_tfs)
+        set_gene_only = list(set(gene_list) - df_tfs)
+        return set_both, set_gene_only
+    
+""" 
+    def get_gene_data(self, gene_list, copy=False, force_dense=False, to_df=False, zscore=False):
+
+        x = self._adata[:, gene_list]
+        labels = x.var_names
+
+        if (force_dense or to_df or zscore) and self.is_sparse:
+            x = x.X.A
+        else:
+            x = x.X
+
+        if zscore:
+            x = np.subtract(x, self.obs_means.reshape(-1, 1))
+            x = np.divide(x, self.obs_stdev.reshape(-1, 1))
+        elif copy:
+            x = x.copy()
+
+        return pd.DataFrame(x, columns=labels, index=self.sample_names) if to_df else x
+"""

@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jan 13 12:03:06 2021
+
+@author: andrew
+"""
+
+import numpy as np
+
+W = np.genfromtxt("W.csv", delimiter=",")
+#X = np.genfromtxt("X.csv", delimiter=",")
+#Y = np.genfromtxt("Y.csv", delimiter=",")
+X_main = np.genfromtxt("X_main.csv", delimiter=",")
+Y_main = np.genfromtxt("Y_main.csv", delimiter=",")
+X_other = np.genfromtxt("X_other.csv", delimiter=",")
+Y_other = np.genfromtxt("Y_other.csv", delimiter=",")
+
+
+
+RSS1 = np.sum((Y_main.T-np.dot(X_main, W[:,0]))**2)
+RSS2 = np.sum((Y_main.T-np.dot(X_main, W[:,1]))**2)
+RSS3 = np.sum((Y_other.T-np.dot(X_other, W[:,0]))**2)
+RSS4 = np.sum((Y_other.T-np.dot(X_other, W[:,1]))**2)
